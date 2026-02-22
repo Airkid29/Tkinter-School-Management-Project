@@ -1,13 +1,16 @@
 """
 Configuration globale de l'application.
-Adapte ces valeurs à ton environnement MySQL avant d'exécuter l'appli.
+Les paramètres DB peuvent être surchargés par variables d'environnement :
+  DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 """
 
+import os
+
 DB_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",  # À modifier
-    "database": "university_db",
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ.get("DB_PASSWORD", ""),
+    "database": os.environ.get("DB_NAME", "university_db"),
 }
 
 APP_CONFIG = {
