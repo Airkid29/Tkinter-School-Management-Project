@@ -1,13 +1,17 @@
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher, exceptions
 
-ph = PasswordHasher()
 
-# Hachage (le sel est géré automatiquement)
-hash_mdp = ph.hash("mon_mot_de_passe_secret")
+_ph = PasswordHasher()
 
-# Vérification
-try:
-    ph.verify(hash_mdp, "mon_mot_de_passe_secret")
-    print("Succès !")
-except:
-    print("Échec !")
+
+def hash_password(password: str) -> str:
+    """Hash Argon2 d'un mot de passe en texte clair."""
+    return _ph.hash(password)
+
+
+def verify_password(hashed: str, password: str) -> bool:
+    """Vérifie un mot de passe par rapport à un hash Argon2 stocké."""
+    try:
+        return _ph.verify(hashed, password)
+    except (exceptions.VerifyMismatchError, exceptions.VerificationError, exceptions.InvalidHashError):
+        return False

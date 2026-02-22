@@ -43,14 +43,14 @@ def create_tables():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Utilisateurs (admins, staff, etc.)
+        # Utilisateurs (admins, users, etc.)
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
-                role ENUM('admin', 'staff') NOT NULL DEFAULT 'staff',
+                role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             """

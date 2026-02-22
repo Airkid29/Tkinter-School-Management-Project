@@ -5,11 +5,7 @@ Logique d'accès aux données pour les utilisateurs (table `users`).
 import hashlib
 
 from db import execute_query
-
-
-def _hash_password(password: str) -> str:
-    """Retourne un hash sécurisé (SHA256) du mot de passe."""
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+from hash_password import hash_password, verify_password
 
 
 def create_default_admin_if_not_exists():
@@ -26,7 +22,7 @@ def create_default_admin_if_not_exists():
             INSERT INTO users (username, password_hash, role)
             VALUES (%s, %s, %s)
             """,
-            params=("admin", _hash_password("admin123"), "admin"),
+            params=("admin", hash_password("admin123"), "admin"),
             commit=True,
         )
 
@@ -45,8 +41,19 @@ def authenticate_user(username: str, password: str):
     if not user:
         return None
 
-    if user["password_hash"] != _hash_password(password):
-        return None
+    if verify_password(user["password_hash"], password):
+        return user
 
-    return user
+    # Rétrocompatibilité : anciens hashes SHA256 (avant migration Argon2)
+    legacy_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+    if user["password_hash"] == legacy_hash:
+        # Migration vers Argon2
+        execute_query(
+            "UPDATE users SET password_hash = %s WHERE id = %s",
+            params=(hash_password(password), user["id"]),
+            commit=True,
+        )
+        return user
+
+    return None
 
