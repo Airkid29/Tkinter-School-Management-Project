@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+mcd_mocodo.txt
 
 # Distribution / packaging
 tests/
